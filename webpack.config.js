@@ -36,17 +36,8 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /\.scss$/i,
-        use: [
-          'style-loader',
-          'css-loader',
-          {
-            loader: 'sass-loader',
-            options: {
-              implementation: require('sass'),
-            },
-          },
-        ],
+        test: /\.css$/i,
+        use: ["style-loader", "css-loader"],
       },
       {
         // Now we apply rule for static files
