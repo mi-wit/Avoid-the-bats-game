@@ -7,15 +7,16 @@ export class Enemy {
   speed = 10;
   direction: "right" | "left" = "right";
 
-  constructor(texture: Texture<Resource>[], x: number, y: number) {
+  constructor(texture: Texture<Resource>[], x: number, y: number, layer: number, speed: number = 10) {
     this.sprite = new AnimatedSprite(texture);
-    this.sprite.animationSpeed = 0.1;
+    this.sprite.animationSpeed = 0.1 * speed * 0.5;
     this.sprite.play();
     this.sprite.anchor.set(0.5); // center origin of sprite
     this.sprite.y = y;
     this.sprite.x = x;
+    this.speed = speed;
 
-    this.layer = new Layer(this.sprite);
+    this.layer = new Layer(this.sprite, layer);
   }
 
 

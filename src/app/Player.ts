@@ -31,7 +31,7 @@ export class Player {
   }
 
   onKeyDown(key: { keyCode: number }): void {
-    console.log(this.layer.getDepth());
+    // console.log(this.layer.getDepth());
     // W Key is 87
     // Up arrow is 87
     if (key.keyCode === 87 || key.keyCode === 38) {

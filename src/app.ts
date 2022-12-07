@@ -1,6 +1,6 @@
 
 import {
-  Application, Loader, Resource, Text, Texture, Ticker, settings, SCALE_MODES, Rectangle, BaseTexture, Sprite, AnimatedSprite, FrameObject
+  Application, Loader, Resource, Text, Texture, Ticker, settings, SCALE_MODES, Rectangle, BaseTexture, Sprite, AnimatedSprite, FrameObject, Container
 } from 'pixi.js';
 import { Enemy } from './app/Enemy';
 import {
@@ -25,7 +25,6 @@ const ticker = Ticker.shared;
 
 // Scale mode for all textures, will retain pixelation
 settings.SCALE_MODE = SCALE_MODES.NEAREST;
-
 
 
 // preload needed assets
@@ -53,7 +52,6 @@ loader.load(() => {
   // create and append FPS text
   const fps = new Text('FPS: 0', { fill: 0xffffff });
   app.stage.addChild(fps);
-
   // create and append hero
   const heroTextures: Texture<Resource>[] = [];
   heroImages.forEach((imageName: string) => {
@@ -71,17 +69,32 @@ loader.load(() => {
     const texture = loader.resources[imageName].texture as Texture<Resource>;
     texturesArray.push(texture);
   });
-  const enemy = new Enemy(texturesArray, CENTER, CENTER, );
-  // app.stage.addChild(enemy.sprite);
+
+  const enemies: Enemy[] = [];
+  enemies.push(new Enemy(texturesArray, CENTER, CENTER, 7, 5));
+  enemies.push(new Enemy(texturesArray, CENTER, CENTER, 5, 2));
+  enemies.push(new Enemy(texturesArray, CENTER, CENTER, 2, 12));
+  enemies.push(new Enemy(texturesArray, CENTER, CENTER, 10, 1));
+  enemies.forEach(e => {
+    app.stage.addChild(e.sprite);
+    e.sprite.zIndex = e.layer.getLayer();
+  });
 
   ticker.add(() => {
-    fps.text = `FPS: ${ticker.FPS.toFixed(2)}`;
-    enemy.direction = enemy.getNextEnemyDirection(app.view.width);
-    enemy.sprite.x = enemy.getNextEnemyPosition();
+    fps.text = `FPS: ${ticker.FPS.toFixed(0)}`;
+
+    enemies.forEach((e: Enemy) => {
+      e.direction = e.getNextEnemyDirection(app.view.width);
+      e.sprite.x = e.getNextEnemyPosition();
+    });
+
+    hero.sprite.zIndex = hero.layer.getLayer();
+    app.stage.sortChildren();
+   
   });
 });
 
-
+// app.stage.addChild(mainContainer);
 
 // pomysł na grę: https://pixijs.io/guides/basics/interaction.html
 // zbieranie jedzenia w przestrzeni Z
