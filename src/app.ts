@@ -22,6 +22,7 @@ import {
 } from './app/Player';
 import { Layer } from './common/layer';
 import { sound } from '@pixi/sound';
+import './styles.scss'
 
 // constants
 const SIZE = 512;
