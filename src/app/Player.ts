@@ -21,9 +21,7 @@ export class Player {
     this.sprite.anchor.set(0.5); // center origin of sprite
     this.sprite.y = y;
     this.sprite.x = x;
-    this.layer = new Layer(this.sprite);
-    this.sprite.buttonMode = true;
-    this.sprite.interactive = true;
+    this.layer = new Layer(this.sprite, 11);
     this.sprite.animationSpeed = 0.05;
     this.sprite.play();
 
@@ -38,23 +36,28 @@ export class Player {
 
   }
 
-  onKeyDown(key: { keyCode: number }): void {
+  public onTouch(): void {
     if (this.canMove) {
+      this.layer.decrementLayer();
+      sound.find(this.walkSound).speed = Math.random() + 0.5;
+      sound.play(this.walkSound);
+    }
+  }
+
+  onKeyDown(key: { keyCode: number }): void {
+    
       // W Key is 87
       // Up arrow is 87
       if (key.keyCode === 87 || key.keyCode === 38) {
-        this.layer.decrementLayer();
-        sound.find(this.walkSound).speed = Math.random() + 0.5;
-        sound.play(this.walkSound);
+        this.onTouch();
       }
       
       // S Key is 83
       // Down arrow is 40
-      if (key.keyCode === 83 || key.keyCode === 40) {
-        this.layer.incrementLayer();
-        sound.play(this.walkSound);
-      }
-    }
+      // if (key.keyCode === 83 || key.keyCode === 40) {
+      //   this.layer.incrementLayer();
+      //   sound.play(this.walkSound);
+      // }
   }
 
   setScared(isScared: boolean): void {

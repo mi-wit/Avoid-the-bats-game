@@ -89,6 +89,8 @@ loader.load(() => {
   // background image
   const bT = loader.resources.background.texture as Texture<Resource>;
   const background = new Sprite(bT);
+  background.interactive = true;
+  background.buttonMode = true;
   background.anchor.set(0.5);
   background.x = CENTER;
   background.y = CENTER;
@@ -116,6 +118,9 @@ loader.load(() => {
   scaredHeroTexture.push(loader.resources.scaredHero.texture as Texture<Resource>);
   const hero = new Player(heroTextures, scaredHeroTexture, CENTER, CENTER);
   app.stage.addChild(hero.sprite);
+  background.on('pointerdown', () => {
+    hero.onTouch();
+  });
 
 
   // create and add enemy
@@ -180,7 +185,7 @@ loader.load(() => {
         sound.find('success').volume = 0.1;
         sound.play('success');
 
-        const newEnemy = new Enemy(texturesArray, CENTER, CENTER, randomIntFromInterval(1, 10) , Math.random() * 10);
+        const newEnemy = new Enemy(texturesArray, CENTER, CENTER, randomIntFromInterval(1, 10) , Math.random() * 10, randomIntFromInterval(0, 100));
         enemies.push(newEnemy);
         app.stage.addChild(newEnemy.sprite);
         newEnemy.sprite.zIndex = newEnemy.layer.getLayer();

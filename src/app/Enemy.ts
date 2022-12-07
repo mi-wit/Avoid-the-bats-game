@@ -6,8 +6,9 @@ export class Enemy {
   layer: Layer;
   speed = 10;
   direction: "right" | "left" = "right";
+  extraRoomForFly: number = 0;
 
-  constructor(texture: Texture<Resource>[], x: number, y: number, layer: number, speed: number = 10) {
+  constructor(texture: Texture<Resource>[], x: number, y: number, layer: number, speed: number = 10, extraRoomForFly: number = 0) {
     this.sprite = new AnimatedSprite(texture);
     this.sprite.animationSpeed = 0.1 * speed * 0.5;
     this.sprite.play();
@@ -15,17 +16,18 @@ export class Enemy {
     this.sprite.y = y;
     this.sprite.x = x;
     this.speed = speed;
+    this.extraRoomForFly = extraRoomForFly;
 
     this.layer = new Layer(this.sprite, layer);
   }
 
 
-  getNextEnemyDirection = (viewWidth: number): "left" | "right" => {
-    if (this.sprite.x >= viewWidth) {
+  getNextEnemyDirection = (maxRight: number, maxLeft: number = 0): "left" | "right" => {
+    if (this.sprite.x >= maxRight + this.extraRoomForFly) {
       this.sprite.scale.x *= -1;
       return "left";
     }
-    if (this.sprite.x <= 0) {
+    if (this.sprite.x <= maxLeft - this.extraRoomForFly) {
       this.sprite.scale.x *= -1;
       return "right";
     }
