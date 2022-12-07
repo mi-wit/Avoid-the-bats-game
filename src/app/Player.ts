@@ -1,21 +1,27 @@
 /* eslint-disable no-param-reassign */
-import { Sprite, Texture, Resource } from "pixi.js";
+import { Sprite, Texture, Resource, AnimatedSprite } from "pixi.js";
 import { Layer } from "../common/layer";
 
 export class Player {
-  sprite: Sprite;
+  sprite: AnimatedSprite;
   speed: number = 5;
   direction: "left" | "right" = "right";
   layer: Layer;
 
-  constructor(texture: Texture<Resource>, x: number, y: number) {
-    this.sprite = new Sprite(texture); // create sprite
+  constructor(texture: Texture<Resource>[], x: number, y: number) {
+    this.sprite = new AnimatedSprite(texture); // create sprite
     this.sprite.anchor.set(0.5); // center origin of sprite
     this.sprite.y = y;
     this.sprite.x = x;
-    this.layer = new Layer();
-    this.sprite.scale.x = this.layer.getDepth();
-    this.sprite.scale.y = this.layer.getDepth();
+    this.layer = new Layer(this.sprite);
+    this.sprite.buttonMode = true;
+    this.sprite.interactive = true;
+    this.sprite.animationSpeed = 0.05;
+    this.sprite.play();
+
+    this.sprite.onComplete = () => {
+      this.sprite.animationSpeed *= -1.0;
+    }
 
     // listen for keyboard input
     document.addEventListener("keydown", (e) => {
@@ -30,18 +36,12 @@ export class Player {
     // Up arrow is 87
     if (key.keyCode === 87 || key.keyCode === 38) {
       this.layer.decrementLayer();
-
-      this.sprite.scale.x = this.layer.getDepth();
-      this.sprite.scale.y = this.layer.getDepth();
     }
 
     // S Key is 83
     // Down arrow is 40
     if (key.keyCode === 83 || key.keyCode === 40) {
       this.layer.incrementLayer();
-
-      this.sprite.scale.x = this.layer.getDepth();
-      this.sprite.scale.y = this.layer.getDepth();
     }
 
     // // A Key is 65

@@ -15,14 +15,9 @@ export class Enemy {
     this.sprite.y = y;
     this.sprite.x = x;
 
-    this.layer = new Layer();
-    this.updateLayer();
+    this.layer = new Layer(this.sprite);
   }
 
-  updateLayer(): void {
-    this.sprite.scale.x = this.layer.getDepth();
-    this.sprite.scale.y = this.layer.getDepth();
-  }
 
   getNextEnemyDirection = (viewWidth: number): "left" | "right" => {
     if (this.sprite.x >= viewWidth) {

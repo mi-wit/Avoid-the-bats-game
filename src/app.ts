@@ -29,8 +29,16 @@ settings.SCALE_MODE = SCALE_MODES.NEAREST;
 
 
 // preload needed assets
-loader.add('samir', '/assets/img/hero.png');
-loader.add('enemy', '/assets/img/enemy.png');
+const heroImages = [
+  '1.png',
+  '2.png',
+  '3.png',
+  '4.png',
+];
+heroImages.forEach((imageName: string) => {
+  loader.add(imageName, `/assets/img/penguin/idle/${imageName}`);
+});
+
 const alienImages = [
   'tile005.png',
   'tile006.png',
@@ -47,11 +55,14 @@ loader.load(() => {
   app.stage.addChild(fps);
 
   // create and append hero
-  const heroTexture = loader.resources.samir.texture as Texture<Resource>;
-  const hero = new Player(heroTexture, CENTER, CENTER);
+  const heroTextures: Texture<Resource>[] = [];
+  heroImages.forEach((imageName: string) => {
+    const texture = loader.resources[imageName].texture as Texture<Resource>;
+    heroTextures.push(texture);
+  });
+  const hero = new Player(heroTextures, CENTER, CENTER);
   app.stage.addChild(hero.sprite);
-  hero.sprite.interactive = true;
-  hero.sprite.buttonMode = true;
+
 
   // create and add enemy
 
@@ -61,7 +72,7 @@ loader.load(() => {
     texturesArray.push(texture);
   });
   const enemy = new Enemy(texturesArray, CENTER, CENTER, );
-  app.stage.addChild(enemy.sprite);
+  // app.stage.addChild(enemy.sprite);
 
   ticker.add(() => {
     fps.text = `FPS: ${ticker.FPS.toFixed(2)}`;
