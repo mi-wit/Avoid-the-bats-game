@@ -1,19 +1,34 @@
 
 import {
-  Application, Loader, Resource, Text, Texture, Ticker, settings, SCALE_MODES, Rectangle, BaseTexture, Sprite, AnimatedSprite, FrameObject, Container
+  Application, 
+  Loader,
+  Resource, 
+  Text, 
+  Texture, 
+  Ticker, 
+  settings, 
+  SCALE_MODES, 
+  Rectangle, 
+  BaseTexture, 
+  Sprite, 
+  AnimatedSprite, 
+  FrameObject, 
+  Container,
+  Graphics
 } from 'pixi.js';
 import { Enemy } from './app/Enemy';
 import {
-  Player, getNextEntityDirection, getNextEntityPosition,
+  Player
 } from './app/Player';
 import { Layer } from './common/layer';
+import { sound } from '@pixi/sound';
 
 // constants
 const SIZE = 512;
 const CENTER = SIZE / 2;
 
 // global variables
-let lives_num = 10;
+let lives_num = 5;
 let points_num = 0;
 
 // create and append app
@@ -25,6 +40,7 @@ const app = new Application({
   sharedLoader: true,
 });
 document.body.appendChild(app.view);
+const graphics = new Graphics();
 const loader = Loader.shared;
 const ticker = Ticker.shared;
 
@@ -52,9 +68,22 @@ const alienImages = [
 alienImages.forEach((imageName: string) => {
   loader.add(imageName, `/assets/img/bat/fly/${imageName}`);
 });
-
 loader.add('background', `assets/img/dungeon.png`);
-loader.add('backgroundMusic', `assets/sounds/wind1.mp3`);
+
+// add all sounds
+sound.add('backgroundMusic', `assets/sounds/wind1.mp3`);
+sound.add('walk', `assets/sounds/stone01.ogg`);
+sound.add('walk2', `assets/sounds/mud02.ogg`);
+sound.add('batHit', `assets/sounds/batHit.wav`);
+sound.add('batHit2', `assets/sounds/batHit2.wav`);
+sound.add('success', `assets/sounds/good.wav`);
+sound.add('jump', `assets/sounds/jump.wav`);
+
+// prepare lives indicator
+graphics.zIndex = 9999;
+reDrawHealthPoints();
+app.stage.addChild(graphics);
+
 // when loader is ready
 loader.load(() => {
   // background image
@@ -66,21 +95,14 @@ loader.load(() => {
   app.stage.addChild(background);
 
 // background music
-const music = loader.resources.backgroundMusic.data as Sound<Resource>;
-
-  // create and append FPS text
-  const fps: Text = new Text('FPS: 0', { fill: 0xffffff });
-  app.stage.addChild(fps);
+  sound.find('backgroundMusic').loop = true;
+  sound.play('backgroundMusic');
 
   // create and append points text
   const points: Text = new Text(`Points: ${points_num}`, { fill: 0xffffff });
-  points.y = 20;
+  points.y = 10;
+  points.x = 10;
   app.stage.addChild(points);
-
-  // create and append lives text
-  const lives: Text = new Text(`Lives: ${lives_num}`, { fill: 0xffffff });
-  lives.y = 40;
-  app.stage.addChild(lives);
 
   // create and append hero
   const heroTextures: Texture<Resource>[] = [];
@@ -106,10 +128,8 @@ const music = loader.resources.backgroundMusic.data as Sound<Resource>;
   });
 
   const enemies: Enemy[] = [];
-  // enemies.push(new Enemy(texturesArray, CENTER, CENTER, 7, 5));
-  enemies.push(new Enemy(texturesArray, CENTER, CENTER, 5, 2));
-  // enemies.push(new Enemy(texturesArray, CENTER, CENTER, 3, 12));
-  // enemies.push(new Enemy(texturesArray, CENTER, CENTER, 9, 1));
+  enemies.push(new Enemy(texturesArray, CENTER, CENTER, 7, 5));
+
   enemies.forEach(e => {
     app.stage.addChild(e.sprite);
     e.sprite.zIndex = e.layer.getLayer();
@@ -118,7 +138,6 @@ const music = loader.resources.backgroundMusic.data as Sound<Resource>;
   
 
   ticker.add(() => {
-    fps.text = `FPS: ${ticker.FPS.toFixed(0)}`;
 
     if (hero.isScared) {
       hero.setScared(false);
@@ -138,7 +157,18 @@ const music = loader.resources.backgroundMusic.data as Sound<Resource>;
           console.log('collision');
           background.alpha = 0.5;
           lives_num -=1;
-          lives.text = `Lives: ${lives_num}`;
+          sound.play('batHit');
+          reDrawHealthPoints();
+
+          if (lives_num <= 0) {
+            const gameOver: Text = new Text('GAME OVER', { fill: 0x630202, fontSize: 60 });
+            gameOver.zIndex = 9999;
+            gameOver.x = CENTER - gameOver.width / 2;
+            gameOver.y = CENTER - gameOver.height / 2;
+            app.stage.addChild(gameOver);
+
+            hero.canMove = false;
+          }
         }
       }
       
@@ -147,6 +177,13 @@ const music = loader.resources.backgroundMusic.data as Sound<Resource>;
         hero.layer.moveToStart();
         points_num += 1;
         points.text = `Points: ${points_num}`;
+        sound.find('success').volume = 0.1;
+        sound.play('success');
+
+        const newEnemy = new Enemy(texturesArray, CENTER, CENTER, randomIntFromInterval(1, 10) , Math.random() * 10);
+        enemies.push(newEnemy);
+        app.stage.addChild(newEnemy.sprite);
+        newEnemy.sprite.zIndex = newEnemy.layer.getLayer();
       }
 
     });
@@ -172,6 +209,21 @@ function rectIntersects(enemy: AnimatedSprite, hero: AnimatedSprite): boolean {
   //         aRect.y < bRect.y + bRect.height;
 }
 
+function reDrawHealthPoints(): void {
+  graphics.clear();
+  const healthPointSize = 25;
+  const padding = 10;
+  graphics.beginFill(0x630202);
+  graphics.lineStyle(2);
+  for (let i = 0; i < lives_num; i ++) {
+    graphics.drawRect(padding + i * healthPointSize, SIZE - healthPointSize - padding, healthPointSize, healthPointSize);
+  }
+  graphics.endFill();  
+}
+
+function randomIntFromInterval(min: number, max: number): number { // min and max included 
+  return Math.floor(Math.random() * (max - min + 1) + min)
+}
 // TODO, sterowanie tylko jednym klawiszem, postać po dojściu do końca wraca na początek i dodaje punkt
 // pomysł na grę: https://pixijs.io/guides/basics/interaction.html
 // zbieranie jedzenia w przestrzeni Z

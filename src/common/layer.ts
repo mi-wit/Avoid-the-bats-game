@@ -34,7 +34,6 @@ export class Layer {
             
             this.depth /= this.depth_ratio;
             this.layer -=1;
-            console.log(this.layer);
             this.updateLayer();
         }
     }
