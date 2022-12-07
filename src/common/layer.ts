@@ -2,8 +2,8 @@ import { AnimatedSprite } from "pixi.js";
 
 export class Layer {
     private animatedSprite: AnimatedSprite;
-    private MAX_DEPTH = 10;
-    private MIN_DEPTH = 1;
+    MAX_DEPTH = 10;
+    MIN_DEPTH = 1;
     private depth_ratio = 1.25;
     private depth = 1;
     private layer: number; // should be between MAX_DEPTH and MIN_DEPTH
@@ -47,8 +47,15 @@ export class Layer {
         return this.layer;
     }
 
-  updateLayer(): void {
-    this.animatedSprite.scale.x = this.depth;
-    this.animatedSprite.scale.y = this.depth;
-  }
+    updateLayer(): void {
+        this.animatedSprite.scale.x = this.depth;
+        this.animatedSprite.scale.y = this.depth;
+    }
+
+    moveToStart(): void {
+        while(this.layer < 11) {
+            this.incrementLayer();
+        }
+
+    }
 }

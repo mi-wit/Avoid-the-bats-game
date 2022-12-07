@@ -24,6 +24,7 @@
     "seed"
   ],
   "dependencies": {
+    "@pixi/sound": "^5.0.0",
     "pixi.js": "6.4.2"
   },
   "devDependencies": {

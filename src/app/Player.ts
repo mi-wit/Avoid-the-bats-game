@@ -7,9 +7,14 @@ export class Player {
   speed: number = 5;
   direction: "left" | "right" = "right";
   layer: Layer;
+  idleTexture: Texture<Resource>[];
+  scaredTexture: Texture<Resource>[];
+  isScared = false;
 
-  constructor(texture: Texture<Resource>[], x: number, y: number) {
-    this.sprite = new AnimatedSprite(texture); // create sprite
+  constructor(idleTexture: Texture<Resource>[], scaredTexture: Texture<Resource>[], x: number, y: number) {
+    this.idleTexture = idleTexture;
+    this.scaredTexture = scaredTexture;
+    this.sprite = new AnimatedSprite(idleTexture); // create sprite
     this.sprite.anchor.set(0.5); // center origin of sprite
     this.sprite.y = y;
     this.sprite.x = x;
@@ -63,6 +68,16 @@ export class Player {
     //         sprite.position.x += boxWidth;
     //     }
     // }
+  }
+
+  setScared(isScared: boolean): void {
+    this.isScared = isScared;
+    if (isScared) {
+      this.sprite.textures = this.scaredTexture;
+    } else {
+      this.sprite.textures = this.idleTexture;
+      this.sprite.play();
+    }
   }
 
 }
